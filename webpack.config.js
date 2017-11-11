@@ -3,6 +3,7 @@ const glob = require("glob");
 const webpack = require("webpack");
 
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const srcPath = path.resolve(__dirname, "client/src");
 const nodeModulesPath = path.resolve(__dirname, "node_modules");
@@ -28,7 +29,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "client/dist"),
     filename: "js/[name].js",
-    publicPath: "/dist/",
+    publicPath: "../dist/",
     chunkFilename: "chunk/[name].chunk.js"
   },
 
@@ -45,16 +46,9 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [
-          { loader: "style-loader" },
-          {
-            loader: "css-loader",
-            options: {
-              modules: true,
-              importLoaders: 1
-            }
-          }
-        ]
+        use: ExtractTextPlugin.extract({
+          use: "css-loader"
+        })
       },
       {
         test: /\.html$/,
@@ -65,9 +59,26 @@ module.exports = {
       {
         test: /\.(gif|png|jpe?g)$/i,
         loaders: [
-          "url-loader?limit=8192&name=img/[name]-[hash:5].[ext]",
+          "url-loader?limit=10000&name=img/[name].[ext]",
           "image-webpack-loader"
         ]
+      },
+      // bootstrap
+      {
+        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "file-loader?name=static/[name].[ext]"
+      },
+      {
+        test: /\.woff2?$/,
+        loader: "url-loader?prefix=font/&limit=5000&name=static/[name].[ext]"
+      },
+      {
+        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url-loader?limit=10000&mimetype=application/octet-stream&name=static/[name].[ext]"
+      },
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url-loader?limit=10000&mimetype=image/svg+xml&name=static/[name].[ext]"
       }
     ]
   },
@@ -76,21 +87,16 @@ module.exports = {
     modules: ["node_modules"],
     extensions: [".js", ".json", ".jsx", ".css"],
     alias: {
-      jquery: path.resolve(
-        __dirname,
-        "client/src/public/jquery-3.2.1/jquery-3.2.1.min.js"
-      ),
-      bootstrap: path.resolve(
-        __dirname,
-        "client/src/public/bootstrap-3.3.7/js/bootstrap.min.js"
-      )
+      // 第三方库
     },
     descriptionFiles: ["package.json"]
   },
 
   context: __dirname,
 
-  externals: ["react", "react-dom"],
+  externals: {
+    jquery: "jQuery"
+  },
 
   stats: {
     assets: true,
@@ -115,12 +121,19 @@ module.exports = {
 
   plugins: [
     // new webpack.optimize.UglifyJsPlugin(),
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      React: "react",
+      ReactDOM: "react-dom"
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.optimize.CommonsChunkPlugin({
       name: "vendor",
       filename: "js/vendor.js",
       minChunks: Infinity
-    })
+    }),
+    new ExtractTextPlugin("css/[name].css")
   ],
 
   watch: true,
@@ -138,7 +151,7 @@ chunks.forEach(function(pathname) {
     return;
   }
   var conf = {
-    filename: "./client/view/" + pathname + ".html",
+    filename: "../view/" + pathname + ".html",
     template: "./client/src/template.html",
     inject: "body",
     minify: {
