@@ -12,16 +12,16 @@ const getEntry = (globPath, type) => {
   var entries = {
     vendor: ["react", "react-dom", "jquery", "bootstrap", "./client/src/app"]
   };
-  glob.sync(globPath).forEach(function(entry) {
+  glob.sync(globPath + "/*").forEach(function(entry) {
     var pathname = entry.split("/").splice(-1);
-    entries[pathname] = glob.sync(globPath + "/*." + type);
+    entries[pathname] = glob.sync(globPath + "/" + pathname + "/*." + type);
   });
   console.log("> entries:");
   console.log(entries);
   return entries;
 };
 
-const entries = getEntry("./client/src/views/*", "js");
+const entries = getEntry("./client/src/views", "js");
 const chunks = Object.keys(entries);
 
 module.exports = {
@@ -60,6 +60,7 @@ module.exports = {
         test: /\.(gif|png|jpe?g)$/i,
         loaders: [
           "url-loader?limit=10000&name=img/[name].[ext]",
+          // "file-loader?limit=10000&name=img/[name].[ext]",
           "image-webpack-loader"
         ]
       },
@@ -113,7 +114,7 @@ module.exports = {
     proxy: {
       "/api": "http://localhost:3000/"
     },
-    contentBase: path.join(__dirname, "client/public"),
+    contentBase: path.join(__dirname, "client"),
     compress: true,
     hot: true
     // port:3000

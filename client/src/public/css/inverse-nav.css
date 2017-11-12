@@ -1,0 +1,12 @@
+.bg-inverse {
+    color: rgba(255,255,255,0.5);
+    background-color: #373a3c;
+}
+.img-menu{
+    width: 24px;
+    height: 24px;
+}
+.dropdown-item:hover{
+    color: rgba(255,255,255,0.75);
+    background-color: #373a3c;
+}

@@ -1,6 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import App from "./public/compoments/app"
+import Nav from "./public/compoments/nav"
+import Foot from "./public/compoments/foot"
 
-ReactDOM.render(<App />, document.getElementById("root"));
+require("./public/css/inverse-nav.css")
+require("./public/css/sticky-footer.css")
+
+ReactDOM.render(<Nav />, document.getElementById("nav"));
+ReactDOM.render(<Foot />, document.getElementById("foot"));
